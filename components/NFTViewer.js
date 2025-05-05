@@ -28,7 +28,7 @@ export default function NFTViewer() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://eth-mainnet.g.alchemy.com/nft/v3/YOUR_ALCHEMY_API_KEY/getNFTsForOwner?owner=${address}`
+          `https://eth-mainnet.g.alchemy.com/nft/v3/oQKmm0fzZOpDJLTI64W685aWf8j1LvDr/getNFTsForOwner?owner=${address}`
         );
         const data = await res.json();
         setNfts(data.ownedNfts || []);
