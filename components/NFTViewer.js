@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-const normalizeUrl = (url) =>
-  url?.startsWith("ipfs://")
-    ? url.replace("ipfs://", "https://ipfs.io/ipfs/")
-    : url;
+const normalizeUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("ipfs://ipfs/")) {
+    return url.replace("ipfs://ipfs/", "https://ipfs.io/ipfs/");
+  }
+  if (url.startsWith("ipfs://")) {
+    return url.replace("ipfs://", "https://ipfs.io/ipfs/");
+  }
+  return url;
+};
 
 const getNFTTitle = (nft) =>
   nft.title || nft.name || nft.metadata?.name || nft.rawMetadata?.name || "Untitled";
@@ -22,7 +28,7 @@ export default function NFTViewer() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://eth-mainnet.g.alchemy.com/nft/v3/oQKmm0fzZOpDJLTI64W685aWf8j1LvDr/getNFTsForOwner?owner=${address}`
+          `https://eth-mainnet.g.alchemy.com/nft/v3/YOUR_ALCHEMY_API_KEY/getNFTsForOwner?owner=${address}`
         );
         const data = await res.json();
         setNfts(data.ownedNfts || []);
@@ -66,7 +72,12 @@ export default function NFTViewer() {
               className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow"
             >
               <img
-                src={normalizeUrl(nft.media?.[0]?.gateway || nft.metadata?.image || "")}
+                src={normalizeUrl(
+                  nft.media?.[0]?.gateway ||
+                  nft.rawMetadata?.image ||
+                  nft.metadata?.image ||
+                  ""
+                )}
                 alt={getNFTTitle(nft)}
                 className="w-full h-40 object-cover rounded-md"
               />
