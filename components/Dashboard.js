@@ -4,6 +4,7 @@ import TokenBalances from "./TokenBalances";
 import TokenTransfer from "./TokenTransfer";
 import WalletCard from "./WalletCard";
 import ActivityCard from "./ActivityCard";
+import NFTViewer from "./NFTViewer";
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -123,6 +124,7 @@ export default function Dashboard() {
           <ActivityCard />
         </div>
       </div>
-    </div>
+      <NFTViewer />
+</div>
   );
 }
