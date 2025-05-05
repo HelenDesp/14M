@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-const normalizeUrl = (url) => {
-  if (!url) return "";
-  if (url.startsWith("ipfs://ipfs/")) {
-    return url.replace("ipfs://ipfs/", "https://ipfs.io/ipfs/");
+const getImageUrl = (nft) => {
+  const ipfsImage =
+    nft.rawMetadata?.image || nft.metadata?.image || nft.image || "";
+
+  if (ipfsImage.startsWith("ipfs://")) {
+    return ipfsImage.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
-  if (url.startsWith("ipfs://")) {
-    return url.replace("ipfs://", "https://ipfs.io/ipfs/");
-  }
-  return url;
+
+  return ipfsImage;
 };
 
 const getNFTTitle = (nft) =>
@@ -72,12 +72,7 @@ export default function NFTViewer() {
               className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow"
             >
               <img
-                src={normalizeUrl(
-                  nft.media?.[0]?.gateway ||
-                  nft.rawMetadata?.image ||
-                  nft.metadata?.image ||
-                  ""
-                )}
+                src={getImageUrl(nft)}
                 alt={getNFTTitle(nft)}
                 className="w-full h-40 object-cover rounded-md"
               />
