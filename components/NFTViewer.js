@@ -4,14 +4,26 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 const getImageUrl = (nft) => {
-  const ipfsImage =
-    nft.rawMetadata?.image || nft.metadata?.image || nft.image || "";
+  let image =
+    nft.media?.[0]?.gateway ||
+    nft.rawMetadata?.image ||
+    nft.metadata?.image ||
+    nft.image ||
+    "";
 
-  if (typeof ipfsImage === "string" && ipfsImage.startsWith("ipfs://")) {
-    return ipfsImage.replace("ipfs://", "https://ipfs.io/ipfs/");
+  if (typeof image !== "string") {
+    console.warn("Non-string image found:", image);
+    return "";
   }
 
-  return ipfsImage;
+  if (image.startsWith("ipfs://ipfs/")) {
+    image = image.replace("ipfs://ipfs/", "https://ipfs.io/ipfs/");
+  } else if (image.startsWith("ipfs://")) {
+    image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
+  }
+
+  console.log("Resolved image:", image);
+  return image;
 };
 
 const getNFTTitle = (nft) =>
@@ -28,7 +40,7 @@ export default function NFTViewer() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://eth-mainnet.g.alchemy.com/nft/v3/oQKmm0fzZOpDJLTI64W685aWf8j1LvDr/getNFTsForOwner?owner=${address}`
+          `https://eth-mainnet.g.alchemy.com/nft/v3/YOUR_ALCHEMY_API_KEY/getNFTsForOwner?owner=${address}`
         );
         const data = await res.json();
         setNfts(data.ownedNfts || []);
