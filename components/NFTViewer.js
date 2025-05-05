@@ -7,7 +7,7 @@ const getImageUrl = (nft) => {
   const ipfsImage =
     nft.rawMetadata?.image || nft.metadata?.image || nft.image || "";
 
-  if (ipfsImage.startsWith("ipfs://")) {
+  if (typeof ipfsImage === "string" && ipfsImage.startsWith("ipfs://")) {
     return ipfsImage.replace("ipfs://", "https://ipfs.io/ipfs/");
   }
 
