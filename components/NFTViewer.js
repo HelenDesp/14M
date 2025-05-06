@@ -4,15 +4,20 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 const getImageUrl = (nft) => {
+  const media = nft.media?.[0];
+
   let image =
-    nft.media?.[0]?.gateway ||
+    media?.cachedUrl ||
+    media?.thumbnailUrl ||
+    media?.pngUrl ||
+    media?.originalUrl ||
     nft.rawMetadata?.image ||
     nft.metadata?.image ||
     nft.image ||
     "";
 
   if (typeof image !== "string") {
-    console.warn("Non-string image found:", image);
+    console.warn("Still invalid image:", image);
     return "";
   }
 
