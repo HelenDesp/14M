@@ -7,25 +7,20 @@ const getImageUrl = (nft) => {
   const media = nft.media?.[0];
   let image = "";
 
-  if (media?.cachedUrl) {
+  if (typeof media?.cachedUrl === "string") {
     image = media.cachedUrl;
-  } else if (media?.thumbnailUrl) {
+  } else if (typeof media?.thumbnailUrl === "string") {
     image = media.thumbnailUrl;
-  } else if (media?.pngUrl) {
+  } else if (typeof media?.pngUrl === "string") {
     image = media.pngUrl;
-  } else if (media?.originalUrl) {
+  } else if (typeof media?.originalUrl === "string") {
     image = media.originalUrl;
-  } else if (nft.rawMetadata?.image) {
+  } else if (typeof nft.rawMetadata?.image === "string") {
     image = nft.rawMetadata.image;
-  } else if (nft.metadata?.image) {
+  } else if (typeof nft.metadata?.image === "string") {
     image = nft.metadata.image;
-  } else if (nft.image) {
+  } else if (typeof nft.image === "string") {
     image = nft.image;
-  }
-
-  if (typeof image !== "string") {
-    console.warn("Still invalid image:", image);
-    return "";
   }
 
   if (image.startsWith("ipfs://ipfs/")) {
@@ -37,7 +32,6 @@ const getImageUrl = (nft) => {
   console.log("Resolved image:", image);
   return image;
 };
-
 
 const getNFTTitle = (nft) =>
   nft.title || nft.name || nft.metadata?.name || nft.rawMetadata?.name || "Untitled";
@@ -53,7 +47,7 @@ export default function NFTViewer() {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://eth-mainnet.g.alchemy.com/nft/v3/oQKmm0fzZOpDJLTI64W685aWf8j1LvDr/getNFTsForOwner?owner=${address}`
+          `https://eth-mainnet.g.alchemy.com/nft/v3/YOUR_ALCHEMY_API_KEY/getNFTsForOwner?owner=${address}`
         );
         const data = await res.json();
         setNfts(data.ownedNfts || []);
