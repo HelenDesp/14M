@@ -3,38 +3,25 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-const getImageUrl = (nft) => {
-  const media = nft.media?.[0];
-  let image = "";
+// --- begin: extracted helper ---
+const extractNFTData = (nftsRaw) => {
+  return nftsRaw.map((nft) => {
+    const metadata = nft.metadata || nft.rawMetadata || {};
+    const image = typeof metadata.image === "string"
+      ? (metadata.image.startsWith("ipfs://")
+        ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
+        : metadata.image)
+      : "";
 
-  if (typeof media?.cachedUrl === "string") {
-    image = media.cachedUrl;
-  } else if (typeof media?.thumbnailUrl === "string") {
-    image = media.thumbnailUrl;
-  } else if (typeof media?.pngUrl === "string") {
-    image = media.pngUrl;
-  } else if (typeof media?.originalUrl === "string") {
-    image = media.originalUrl;
-  } else if (typeof nft.rawMetadata?.image === "string") {
-    image = nft.rawMetadata.image;
-  } else if (typeof nft.metadata?.image === "string") {
-    image = nft.metadata.image;
-  } else if (typeof nft.image === "string") {
-    image = nft.image;
-  }
-
-  if (image.startsWith("ipfs://ipfs/")) {
-    image = image.replace("ipfs://ipfs/", "https://ipfs.io/ipfs/");
-  } else if (image.startsWith("ipfs://")) {
-    image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
-  }
-
-  console.log("Resolved image:", image);
-  return image;
+    return {
+      tokenId: parseInt(nft.tokenId, 16).toString(),
+      name: metadata.name || "Untitled",
+      description: metadata.description || "",
+      image,
+    };
+  });
 };
-
-const getNFTTitle = (nft) =>
-  nft.title || nft.name || nft.metadata?.name || nft.rawMetadata?.name || "Untitled";
+// --- end: extracted helper ---
 
 export default function NFTViewer() {
   const { address, isConnected } = useAccount();
@@ -50,7 +37,8 @@ export default function NFTViewer() {
           `https://eth-mainnet.g.alchemy.com/nft/v3/oQKmm0fzZOpDJLTI64W685aWf8j1LvDr/getNFTsForOwner?owner=${address}`
         );
         const data = await res.json();
-        setNfts(data.ownedNfts || []);
+        const cleaned = extractNFTData(data.ownedNfts || []);
+        setNfts(cleaned);
       } catch (err) {
         console.error("Failed to fetch NFTs:", err);
       } finally {
@@ -91,12 +79,12 @@ export default function NFTViewer() {
               className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow"
             >
               <img
-                src={getImageUrl(nft)}
-                alt={getNFTTitle(nft)}
+                src={nft.image}
+                alt={nft.name}
                 className="w-full h-40 object-cover rounded-md"
               />
               <div className="mt-2 text-sm font-medium text-gray-800 dark:text-white">
-                {getNFTTitle(nft)}
+                #{nft.tokenId} — {nft.name}
               </div>
             </div>
           ))}
