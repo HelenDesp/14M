@@ -5,16 +5,23 @@ import { useAccount } from "wagmi";
 
 const getImageUrl = (nft) => {
   const media = nft.media?.[0];
+  let image = "";
 
-  let image =
-    media?.cachedUrl ||
-    media?.thumbnailUrl ||
-    media?.pngUrl ||
-    media?.originalUrl ||
-    nft.rawMetadata?.image ||
-    nft.metadata?.image ||
-    nft.image ||
-    "";
+  if (media?.cachedUrl) {
+    image = media.cachedUrl;
+  } else if (media?.thumbnailUrl) {
+    image = media.thumbnailUrl;
+  } else if (media?.pngUrl) {
+    image = media.pngUrl;
+  } else if (media?.originalUrl) {
+    image = media.originalUrl;
+  } else if (nft.rawMetadata?.image) {
+    image = nft.rawMetadata.image;
+  } else if (nft.metadata?.image) {
+    image = nft.metadata.image;
+  } else if (nft.image) {
+    image = nft.image;
+  }
 
   if (typeof image !== "string") {
     console.warn("Still invalid image:", image);
@@ -30,6 +37,7 @@ const getImageUrl = (nft) => {
   console.log("Resolved image:", image);
   return image;
 };
+
 
 const getNFTTitle = (nft) =>
   nft.title || nft.name || nft.metadata?.name || nft.rawMetadata?.name || "Untitled";
