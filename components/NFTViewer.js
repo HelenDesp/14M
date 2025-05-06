@@ -7,17 +7,23 @@ import { useAccount } from "wagmi";
 const extractNFTData = (nftsRaw) => {
   return nftsRaw.map((nft) => {
     const metadata = nft.metadata || nft.rawMetadata || {};
-    const image = typeof metadata.image === "string"
-      ? (metadata.image.startsWith("ipfs://")
-        ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
-        : metadata.image)
-      : "";
+    const tokenId = parseInt(nft.tokenId, 16).toString();
+
+    const name =
+      typeof metadata.name === "string" && metadata.name.trim().length > 0
+        ? metadata.name
+        : `Token #${tokenId}`;
+
+    const image = nft.media?.[0]?.cachedUrl ||
+                  (typeof metadata.image === "string"
+                    ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
+                    : "");
 
     return {
-      tokenId: parseInt(nft.tokenId, 16).toString(),
-      name: metadata.name || "Untitled",
-      description: metadata.description || "",
+      tokenId,
+      name,
       image,
+      description: metadata.description || "",
     };
   });
 };
